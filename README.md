@@ -6,7 +6,7 @@
     cd orsee-container
     cp .env-example .env
     curl https://raw.githubusercontent.com/orsee/orsee/master/install/install.sql -o db/docker-entrypoint-initdb.d/install.sql
-    docker-compose up -d
+    docker compose up -d
 
 Wait a few seconds then navigate to http://localhost:8080/orsee/public/
 
@@ -28,6 +28,7 @@ Supported variables and their defaults:
 Required at build-time:
 
     ROOT_DIRECTORY=/orsee
+    ORSEE_VERSION_TAG=orsee_3.4.0
 
 Used only during database initialisation:  
 
@@ -44,6 +45,6 @@ If you include config files in the image, they will override environment variabl
 ## Live environments
 
 This should provide a relatively cromulent ORSEE distribution. If you plan on running this in production, I leave it to you on how to deal with:
-- Database backups (Hint: `docker exec orsee-3.2.0-db bash -c 'mysqldump -u $MYSQL_USER -p$MYSQL_PASSWORD $MYSQL_DATABASE' > orseedump.sql`)
+- Database backups (Hint: `docker exec orsee-container-db-1 bash -c 'mariadb-dump -u $MYSQL_USER -p$MYSQL_PASSWORD $MYSQL_DATABASE' > orseedump.sql`)
 - Apache/PHP version updates (Hint: regularly rebuild your container image and redeploy)
-- Cron (Hint: `docker exec orsee-container_web_1 bash -c "cd /var/www/html/orsee/admin && /usr/local/bin/php /var/www/html/orsee/admin/cron.php"`
+- Cron (Hint: `docker exec orsee-container-web-1 bash -c "cd /var/www/html/orsee/admin && /usr/local/bin/php /var/www/html/orsee/admin/cron.php"`
