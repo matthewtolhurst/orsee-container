@@ -1,20 +1,6 @@
 SETTINGS_TEMPLATE=/var/www/html$ROOT_DIRECTORY/install/settings-dist.php
 SETTINGS_DESTINATION=/var/local/settings.php
 SETTINGS_ORIGINAL_LOCATION=/var/www/html$ROOT_DIRECTORY/config/settings.php
-MAIL_SETTINGS=/etc/ssmtp/ssmtp.conf
-
-if [ -f "$MAIL_SETTINGS" ]; then
-    #We already have a mail conf
-    echo "Found custom $MAIL_SETTINGS"
-else
-    #Set SMTP here
-    if [ -n "$SMTP_SERVER_AND_PORT" ]; then
-        echo "mailhub=$SMTP_SERVER_AND_PORT" > $MAIL_SETTINGS
-    else
-        #A hopefully sane default
-        echo "mailhub=host.docker.internal:25" > $MAIL_SETTINGS
-    fi
-fi
 
 if [ -f "$SETTINGS_ORIGINAL_LOCATION" ]; then
     #We already have a settings file
@@ -28,6 +14,7 @@ cat $SETTINGS_TEMPLATE > $SETTINGS_DESTINATION
 #Always set these
 sed -i "s/^\$settings__root_to_server=\".*/\$settings__root_to_server=\"\/var\/www\/html\";/" $SETTINGS_DESTINATION
 sed -i "s/^\$settings__server_url=\".*/\$settings__server_url=\"localhost:8080\";/" $SETTINGS_DESTINATION
+sed -i "s/^\$settings__mail_transport=\".*/\$settings__mail_transport=\"phpmailer\";/" $SETTINGS_DESTINATION
 
 #Set remaining options...
 if [ -n "$ROOT_DIRECTORY" ]; then
@@ -73,4 +60,34 @@ fi
 if [ -n "$TIMEZONE" ]; then
     echo "Got TIMEZONE=$TIMEZONE"
     sed -i "s#^date_default_timezone_set.*#date_default_timezone_set\('$TIMEZONE'\);#" $SETTINGS_DESTINATION
+fi
+
+if [ -n "$SMTP_HOST" ]; then
+    echo "Got SMTP_HOST=$SMTP_HOST"
+    sed -i "s/^\$settings__phpmailer_host=\".*/\$settings__phpmailer_host=\"$SMTP_HOST\";/" $SETTINGS_DESTINATION
+fi
+
+if [ -n "$SMTP_PORT" ]; then
+    echo "Got SMTP_PORT=$SMTP_PORT"
+    sed -i "s/^\$settings__phpmailer_port=.*/\$settings__phpmailer_port=$SMTP_PORT;/" $SETTINGS_DESTINATION
+fi
+
+if [ -v $SMTP_SECURE ]; then
+    echo "Got SMTP_SECURE=$SMTP_SECURE"
+    sed -i "s/^\$settings__phpmailer_smtp_secure=\".*/\$settings__phpmailer_smtp_secure=\"$SMTP_SECURE\";/" $SETTINGS_DESTINATION
+fi
+
+if [ -n "$SMTP_AUTH_TYPE" ]; then
+    echo "Got SMTP_AUTH_TYPE=$SMTP_AUTH_TYPE"
+    sed -i "s/^\$settings__phpmailer_smtp_auth_type=\".*/\$settings__phpmailer_smtp_auth_type=\"$SMTP_AUTH_TYPE\";/" $SETTINGS_DESTINATION
+fi
+
+if [ -n "$SMTP_USERNAME" ]; then
+    echo "Got SMTP_USERNAME=$SMTP_USERNAME"
+    sed -i "s/^\$settings__phpmailer_username=\".*/\$settings__phpmailer_username=\"$SMTP_USERNAME\";/" $SETTINGS_DESTINATION
+fi
+
+if [ -n "$SMTP_PASSWORD" ]; then
+    echo "Got SMTP_PASSWORD=$SMTP_PASSWORD"
+    sed -i "s/^\$settings__phpmailer_password=\".*/\$settings__phpmailer_password=\"$SMTP_PASSWORD\";/" $SETTINGS_DESTINATION
 fi

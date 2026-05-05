@@ -23,7 +23,12 @@ Supported variables and their defaults:
     MYSQL_HOST=localhost
     MYSQL_TABLE_PREFIX=or_
     TIMEZONE=Australia/Sydney
-    SMTP_SERVER_AND_PORT=host.docker.internal:25
+    SMTP_HOST=host.docker.internal
+    SMTP_PORT=25
+    SMTP_SECURE=            # <|tls|ssl>
+    SMTP_AUTH_TYPE=none     # <none|password>
+    SMTP_USERNAME=
+    SMTP_PASSWORD=
 
 Required at build-time:
 
@@ -36,9 +41,7 @@ Used only during database initialisation:
 
 Add any additional files you need to include in your image to `web/` - for example, style files to `web/var/www/html/orsee/style/mystyle`
 
-If you include config files in the image, they will override environment variables.  
-- `web/etc/ssmtp/ssmtp.conf`  
-    Example file here: https://wiki.archlinux.org/title/SSMTP  
+If you include config files in the image, they will override environment variables. This is useful if you need something the environment variables don't provide.
 - `web/var/www/html/orsee/config/settings.php`  
     Example file is in the ORSEE distibution as settings-dist.php  
 
