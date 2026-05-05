@@ -1,12 +1,11 @@
-version: "3.6"
-
 services:
   web:
-    image: orsee:3.2.0
+    image: orsee:${ORSEE_VERSION_TAG}
     build:
       context: ./web
       args:
         ROOT_DIRECTORY: ${ROOT_DIRECTORY:-/orsee}
+        ORSEE_VERSION_TAG: ${ORSEE_VERSION_TAG}
     ports:
       - 8080:80
     env_file:
@@ -17,14 +16,14 @@ services:
       - /var/cache
       - /var/local
   db:
-    image: mariadb:10.11
+    image: mariadb:12.2
     volumes:
       - db:/var/lib/mysql
       - ./db/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
     env_file:
       - .env
-  mailhog:
-    image: mailhog
+  mailpit:
+    image: axllent/mailpit
     ports:
       - 8025:8025
     profiles:
